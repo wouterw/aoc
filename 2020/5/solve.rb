@@ -3,34 +3,10 @@
 require 'set'
 
 def seat_id(boarding_pass)
-  row = find_row(boarding_pass[..6])
-  column = find_column(boarding_pass[-3..])
-
-  row * 8 + column
+  boarding_pass.tr('BFLR', '1001').to_i(2)
 end
 
-def find_row(steps)
-  find_index(0..127, steps)
-end
-
-def find_column(steps)
-  find_index(0..7, steps)
-end
-
-def find_index(range, steps)
-  result = steps.reduce(range) do |memo, step|
-    lower, upper = memo.each_slice(memo.count / 2).to_a
-
-    case step
-    when 'R', 'B' then upper
-    when 'L', 'F' then lower
-    end
-  end
-
-  result.first
-end
-
-boarding_passes = ARGF.readlines.map(&:strip).map(&:chars)
+boarding_passes = ARGF.readlines.map(&:strip)
 
 seat_ids = boarding_passes.map { |boarding_pass| seat_id(boarding_pass) }.sort
 
