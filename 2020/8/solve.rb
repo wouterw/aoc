@@ -11,9 +11,9 @@ end
 
 def execute(program)
   instruction_pointer = 0
-  visited_instructions = Set.new
   accumulator = 0
   exit_code = 0
+  visited_instructions = Set.new
 
   loop do
     if instruction_pointer >= program.size
@@ -21,15 +21,14 @@ def execute(program)
       break
     end
 
-    instruction = program[instruction_pointer]
-    operation, argument = instruction
-
     if visited_instructions.include?(instruction_pointer)
       exit_code = 1
       break
     end
 
     visited_instructions.add(instruction_pointer)
+
+    operation, argument = program[instruction_pointer]
 
     case operation
     when 'acc'
