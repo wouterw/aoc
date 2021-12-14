@@ -1,0 +1,53 @@
+# Advent of Code 2021, Day 2
+
+## Setup
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.4.1"}
+])
+```
+
+```elixir
+input = Kino.Input.textarea("Input")
+```
+
+```elixir
+commands =
+  input
+  |> Kino.Input.read()
+  |> String.split("\n")
+  |> Enum.map(&String.split/1)
+  |> Enum.map(fn [k, v] -> [k, String.to_integer(v)] end)
+```
+
+## Part 1
+
+```elixir
+[depth: d, horizontal: h] =
+  Enum.reduce(commands, [depth: 0, horizontal: 0], fn command, [depth: d, horizontal: h] ->
+    case command do
+      ["forward", x] -> [depth: d, horizontal: h + x]
+      ["up", x] -> [depth: d - x, horizontal: h]
+      ["down", x] -> [depth: d + x, horizontal: h]
+    end
+  end)
+
+d * h
+```
+
+## Part 2
+
+```elixir
+[depth: d, horizontal: h, aim: _] =
+  Enum.reduce(commands, [depth: 0, horizontal: 0, aim: 0], fn command,
+                                                              [depth: d, horizontal: h, aim: a] ->
+    case command do
+      ["forward", x] -> [depth: d + a * x, horizontal: h + x, aim: a]
+      ["up", x] -> [depth: d, horizontal: h, aim: a - x]
+      ["down", x] -> [depth: d, horizontal: h, aim: a + x]
+    end
+  end)
+
+d * h
+```
