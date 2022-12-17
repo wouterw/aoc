@@ -25,55 +25,31 @@ fn total_score_according_to_strategy(moves: &Vec<(char, char)>) -> usize {
     for m in moves {
         // Opponent plays ROCK
         if m.0 == 'A' {
-            // ROCK
-            if m.1 == 'X' {
-                score += points_per_move.get(&m.1).unwrap() + 3;
-            }
-
-            // PAPER
-            if m.1 == 'Y' {
-                score += points_per_move.get(&m.1).unwrap() + 6;
-            }
-
-            // SCISSORS
-            if m.1 == 'Z' {
-                score += points_per_move.get(&m.1).unwrap();
+            match m.1 {
+                'X' => score += points_per_move.get(&m.1).unwrap() + 3, // ROCK
+                'Y' => score += points_per_move.get(&m.1).unwrap() + 6, // PAPER
+                'Z' => score += points_per_move.get(&m.1).unwrap(),     // SCISSORS
+                _ => panic!("derp"),
             }
         }
 
         // Opponent plays PAPER
         if m.0 == 'B' {
-            // ROCK
-            if m.1 == 'X' {
-                score += points_per_move.get(&m.1).unwrap();
-            }
-
-            // PAPER
-            if m.1 == 'Y' {
-                score += points_per_move.get(&m.1).unwrap() + 3;
-            }
-
-            // SCISSORS
-            if m.1 == 'Z' {
-                score += points_per_move.get(&m.1).unwrap() + 6;
+            match m.1 {
+                'X' => score += points_per_move.get(&m.1).unwrap(), // ROCK
+                'Y' => score += points_per_move.get(&m.1).unwrap() + 3, // PAPER
+                'Z' => score += points_per_move.get(&m.1).unwrap() + 6, // SCISSORS
+                _ => panic!("derp"),
             }
         }
 
         // Opponent plays SCISSORS
         if m.0 == 'C' {
-            // ROCK
-            if m.1 == 'X' {
-                score += points_per_move.get(&m.1).unwrap() + 6;
-            }
-
-            // PAPER
-            if m.1 == 'Y' {
-                score += points_per_move.get(&m.1).unwrap();
-            }
-
-            // SCISSORS
-            if m.1 == 'Z' {
-                score += points_per_move.get(&m.1).unwrap() + 3;
+            match m.1 {
+                'X' => score += points_per_move.get(&m.1).unwrap() + 6, // ROCK
+                'Y' => score += points_per_move.get(&m.1).unwrap(),     // PAPER
+                'Z' => score += points_per_move.get(&m.1).unwrap() + 3, // SCISSORS
+                _ => panic!("derp"),
             }
         }
     }
@@ -89,39 +65,30 @@ fn total_score_according_to_strategy_2(moves: &Vec<(char, char)>) -> usize {
         // You need to loss
         if m.1 == 'X' {
             match m.0 {
-                // ROCK
-                'A' => score += points_per_move.get(&'C').unwrap(),
-                // PAPER
-                'B' => score += points_per_move.get(&'A').unwrap(),
-                // SCISSORS
-                'C' => score += points_per_move.get(&'B').unwrap(),
-                _ => println!("derp"),
+                'A' => score += points_per_move.get(&'C').unwrap(), // ROCK
+                'B' => score += points_per_move.get(&'A').unwrap(), // PAPER
+                'C' => score += points_per_move.get(&'B').unwrap(), // SCISSORS
+                _ => panic!("derp"),
             }
         }
 
         // You need to draw
         if m.1 == 'Y' {
             match m.0 {
-                // ROCK
-                'A' => score += points_per_move.get(&'A').unwrap() + 3,
-                // PAPER
-                'B' => score += points_per_move.get(&'B').unwrap() + 3,
-                // SCISSORS
-                'C' => score += points_per_move.get(&'C').unwrap() + 3,
-                _ => println!("derp"),
+                'A' => score += points_per_move.get(&'A').unwrap() + 3, // ROCK
+                'B' => score += points_per_move.get(&'B').unwrap() + 3, // PAPER
+                'C' => score += points_per_move.get(&'C').unwrap() + 3, // SCISSORS
+                _ => panic!("derp"),
             }
         }
 
         // You need to win
         if m.1 == 'Z' {
             match m.0 {
-                // ROCK
-                'A' => score += points_per_move.get(&'B').unwrap() + 6,
-                // PAPER
-                'B' => score += points_per_move.get(&'C').unwrap() + 6,
-                // SCISSORS
-                'C' => score += points_per_move.get(&'A').unwrap() + 6,
-                _ => println!("derp"),
+                'A' => score += points_per_move.get(&'B').unwrap() + 6, // ROCK
+                'B' => score += points_per_move.get(&'C').unwrap() + 6, // PAPER
+                'C' => score += points_per_move.get(&'A').unwrap() + 6, // SCISSORS
+                _ => panic!("derp"),
             }
         }
     }
