@@ -2,8 +2,12 @@ use std::collections::VecDeque;
 
 fn main() {
     let input = include_str!("input.txt");
-    let instructions = parse(input);
-    println!("Part 1: {:?}", sum_of_signal_strenghts(instructions));
+
+    let mut instructions = parse(input);
+    println!("Part 1: {:?}", sum_of_signal_strenghts(&mut instructions));
+
+    let mut instructions = parse(input);
+    println!("Part 2:\n{:}", crt(&mut instructions));
 }
 
 type Program = VecDeque<Op>;
@@ -25,7 +29,7 @@ impl VirtualMachine {
         Self { cycle: 0, x: 0 }
     }
 
-    fn exec(&mut self, mut stack: Program, mut callback: impl FnMut(i32, i32)) {
+    fn exec(&mut self, stack: &mut Program, mut callback: impl FnMut(i32, i32)) {
         self.cycle = 1;
         self.x = 1;
 
@@ -64,7 +68,7 @@ fn parse(input: &str) -> Program {
         .collect()
 }
 
-fn sum_of_signal_strenghts(program: Program) -> i32 {
+fn sum_of_signal_strenghts(program: &mut Program) -> i32 {
     let mut signal_strengths = vec![];
 
     let mut vm = VirtualMachine::new();
@@ -80,6 +84,28 @@ fn sum_of_signal_strenghts(program: Program) -> i32 {
     signal_strengths.iter().sum()
 }
 
+fn crt(program: &mut Program) -> String {
+    let mut pixels = vec![];
+
+    let mut vm = VirtualMachine::new();
+
+    vm.exec(program, |cycle, x| {
+        let col = (cycle - 1) % 40;
+
+        if col >= x - 1 && col <= x + 1 {
+            pixels.push('#');
+        } else {
+            pixels.push('.');
+        };
+    });
+
+    pixels
+        .chunks(40)
+        .map(String::from_iter)
+        .collect::<Vec<String>>()
+        .join("\n")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -87,7 +113,25 @@ mod tests {
     #[test]
     fn test_part_one() {
         let input = include_str!("test.txt");
-        let instructions = parse(input);
-        assert_eq!(sum_of_signal_strenghts(instructions), 13140);
+        let mut instructions = parse(input);
+
+        assert_eq!(sum_of_signal_strenghts(&mut instructions), 13140);
+    }
+
+    #[test]
+    fn test_part_two() {
+        let output = [
+            "##..##..##..##..##..##..##..##..##..##..",
+            "###...###...###...###...###...###...###.",
+            "####....####....####....####....####....",
+            "#####.....#####.....#####.....#####.....",
+            "######......######......######......####",
+            "#######.......#######.......#######.....",
+        ];
+
+        let input = include_str!("test.txt");
+        let mut instructions = parse(input);
+
+        assert_eq!(crt(&mut instructions), output.join("\n").to_string());
     }
 }
