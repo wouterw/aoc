@@ -49,38 +49,54 @@ fn part_one(input: &str) -> usize {
     steps
 }
 
-fn part_two(input: &str) -> usize {
+fn part_two(input: &str) -> i64 {
     let (directions, nodes) = parse(input);
 
-    let mut steps = 0;
-
-    let mut locs = nodes
+    let locs = nodes
         .keys()
         .filter(|k| k.ends_with('A'))
         .cloned()
         .collect::<Vec<_>>();
 
-    println!("{:?}", locs);
+    let steps = locs.iter().map(|l| {
+        let mut loc = l;
+        let mut steps = 0;
 
-    while !locs.iter().all(|&loc| loc.ends_with('Z')) {
-        let dir = directions[steps % directions.len()];
+        while !loc.ends_with('Z') {
+            let dir = directions[steps % directions.len()];
 
-        for loc in locs.iter_mut() {
-            let (left, right) = nodes.get(*loc).unwrap();
+            let (left, right) = nodes.get(loc).unwrap();
 
             match dir {
-                'L' => *loc = left,
-                'R' => *loc = right,
+                'L' => loc = left,
+                'R' => loc = right,
                 _ => panic!("Unknown direction {}", dir),
             }
+
+            steps += 1;
         }
 
-        println!("{:?}", locs);
+        steps
+    });
 
-        steps += 1;
+    println!("{:?}", steps);
+
+    steps.fold(1, |acc, s| lcm(acc as i64, s as i64))
+}
+
+// https://en.wikipedia.org/wiki/Greatest_common_divisor
+// https://en.wikipedia.org/wiki/Euclidean_algorithm
+fn gcd(a: i64, b: i64) -> i64 {
+    match b {
+        0 => a,
+        // Rerun the function with b and the remainder of a / b
+        _ => gcd(b, a % b),
     }
+}
 
-    steps
+// https://en.wikipedia.org/wiki/Least_common_multiple
+pub fn lcm(a: i64, b: i64) -> i64 {
+    a * b / gcd(a, b)
 }
 
 #[test]
