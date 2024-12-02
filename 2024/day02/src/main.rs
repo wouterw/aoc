@@ -16,38 +16,54 @@ fn parse(input: &str) -> Vec<Vec<usize>> {
         .collect()
 }
 
+fn is_safe(report: &[usize]) -> bool {
+    let mut safe = true;
+
+    let delta = report[0] as i32 - report[1] as i32;
+    let incr_or_decr: i32 = if delta.is_positive() { -1 } else { 1 };
+
+    for pair in report.windows(2) {
+        let a = pair[0] as i32;
+        let b = pair[1] as i32;
+
+        let delta = a - b;
+        let abs_delta = delta.abs();
+
+        if delta.is_positive() == incr_or_decr.is_positive() {
+            safe = false;
+            break;
+        }
+
+        if !(abs_delta >= 1 && abs_delta <= 3) {
+            safe = false;
+            break;
+        }
+    }
+
+    safe
+}
+
 fn part_one(input: &str) -> usize {
     let reports = parse(input);
 
-    reports
-        .iter()
-        .filter(|report| {
-            let mut safe = true;
-            let mut incr_or_decr: i32 = 0;
+    reports.iter().filter(|report| is_safe(report)).count()
+}
 
-            for pair in report.windows(2) {
-                let a = pair[0] as i32;
-                let b = pair[1] as i32;
+fn is_safe_with_dampener(report: &[usize]) -> bool {
+    if is_safe(report) {
+        return true;
+    }
 
-                let delta = a - b;
-                let abs_delta = delta.abs();
+    for i in 0..report.len() {
+        let mut report = report.to_vec();
+        report.remove(i);
 
-                if incr_or_decr != 0 && delta.is_positive() == incr_or_decr.is_positive() {
-                    safe = false;
-                    break;
-                }
+        if is_safe(&report) {
+            return true;
+        }
+    }
 
-                incr_or_decr = if delta.is_positive() { -1 } else { 1 };
-
-                if !(abs_delta >= 1 && abs_delta <= 3) {
-                    safe = false;
-                    break;
-                }
-            }
-
-            safe
-        })
-        .count()
+    false
 }
 
 fn part_two(input: &str) -> usize {
@@ -55,30 +71,7 @@ fn part_two(input: &str) -> usize {
 
     reports
         .iter()
-        .filter(|report| {
-            let mut number_of_bad_levels = 0;
-            let mut incr_or_decr: i32 = 0;
-
-            for pair in report.windows(2) {
-                let a = pair[0] as i32;
-                let b = pair[1] as i32;
-
-                let delta = a - b;
-                let abs_delta = delta.abs();
-
-                if incr_or_decr != 0 && delta.is_positive() == incr_or_decr.is_positive() {
-                    number_of_bad_levels += 1;
-                }
-
-                incr_or_decr = if delta.is_positive() { -1 } else { 1 };
-
-                if !(abs_delta >= 1 && abs_delta <= 3) {
-                    number_of_bad_levels += 1;
-                }
-            }
-
-            number_of_bad_levels < 2
-        })
+        .filter(|report| is_safe_with_dampener(report))
         .count()
 }
 
