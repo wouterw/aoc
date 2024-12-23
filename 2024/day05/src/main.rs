@@ -38,29 +38,35 @@ fn page_ordering_rules(rules: Vec<(u32, u32)>) -> HashMap<u32, Vec<u32>> {
     ordering
 }
 
+fn middle_page(pages: &Vec<u32>) -> u32 {
+    let middle = (pages.len() as f32 / 2.0).ceil() as usize - 1;
+    pages[middle]
+}
+
+fn is_correctly_ordered(rules: &HashMap<u32, Vec<u32>>, pages: &Vec<u32>) -> bool {
+    for i in 0..pages.len() - 1 {
+        let a = pages[i];
+        let b = pages[i + 1];
+
+        if !rules.get(&a).unwrap_or(&Vec::<u32>::new()).contains(&b) {
+            return false;
+        }
+    }
+
+    true
+}
+
 fn part_one(input: &str) -> u32 {
     let (rules, series) = parse_input(input);
 
     let ordering = page_ordering_rules(rules);
 
-    let correctly_ordered_pages = series.iter().filter(|pages| {
-        for i in 0..pages.len() - 1 {
-            let a = pages[i];
-            let b = pages[i + 1];
-
-            if !ordering.get(&a).unwrap_or(&Vec::<u32>::new()).contains(&b) {
-                return false;
-            }
-        }
-
-        true
-    });
+    let correctly_ordered_pages = series
+        .iter()
+        .filter(|pages| is_correctly_ordered(&ordering, pages));
 
     correctly_ordered_pages
-        .map(|pages| {
-            let middle = (pages.len() as f32 / 2.0).ceil() as usize - 1;
-            pages[middle]
-        })
+        .map(|pages| middle_page(pages))
         .sum()
 }
 
@@ -69,22 +75,38 @@ fn part_two(input: &str) -> u32 {
 
     let ordering = page_ordering_rules(rules);
 
-    let incorrectly_ordered_pages = series.iter().filter(|pages| {
-        for i in 0..pages.len() - 1 {
-            let a = pages[i];
-            let b = pages[i + 1];
+    let incorrectly_ordered_pages = series
+        .iter()
+        .filter(|pages| !is_correctly_ordered(&ordering, pages));
 
-            if !ordering.get(&a).unwrap_or(&Vec::<u32>::new()).contains(&b) {
-                return true;
+    let corrected_page_updates = incorrectly_ordered_pages.map(|pages| {
+        let mut updated_pages = pages.clone();
+
+        let mut i: usize = 0;
+
+        let default = &Vec::<u32>::new();
+
+        while i < pages.len() - 1 {
+            let a = updated_pages[i];
+            let b = updated_pages[i + 1];
+
+            let rules = ordering.get(&a).unwrap_or(default);
+
+            if !rules.contains(&b) {
+                updated_pages[i] = b;
+                updated_pages[i + 1] = a;
+                i = 0;
+            } else {
+                i += 1;
             }
         }
 
-        false
+        updated_pages
     });
 
-    println!("{:?}", incorrectly_ordered_pages);
-
-    0
+    corrected_page_updates
+        .map(|pages| middle_page(&pages))
+        .sum()
 }
 
 #[cfg(test)]
@@ -156,6 +178,6 @@ mod tests {
 61,13,29
 97,13,75,29,47"#;
 
-        assert_eq!(part_one(input), 123);
+        assert_eq!(part_two(input), 123);
     }
 }
